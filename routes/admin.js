@@ -64,7 +64,8 @@ router.get('/adminHome',adminAuth, function (req, res, next) {
 
 
 router.get('/add-user', adminAuth, (req, res) => {
-  res.render('admin/add-user', { admin: true });
+  res.render('admin/add-user', { admin: true, userExists: req.session.userExists, userExistsMsg: req.session.userExistsMsg});
+  req.session.userExists = false;
 });
 
 
@@ -72,6 +73,10 @@ router.post('/add-user',adminAuth, (req, res) => {
 
   userHelpers.doSignup(req.body).then(() => {
     res.redirect('/admin');
+  }).catch(()=>{
+    req.session.userExists = true;
+    req.session.userExistsMsg = 'User already exists. Please choose a different email.'
+    res.redirect('/admin/add-user');
   })
 });
 
@@ -101,7 +106,8 @@ router.get('/deleteUser/:id',adminAuth, (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
-  req.session.destroy();
+  req.session.admin = null;
+  req.session.adminLoggedIn = false;
   res.redirect('/admin');
 })
 

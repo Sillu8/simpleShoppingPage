@@ -1,3 +1,37 @@
+<script>
+    $(document).ready(function () {
+        $('#signupForm').validate({
+            rules: {
+                userName: {
+                    required: true
+                },
+                userEmail: {
+                    required: true,
+                    email: true
+                },
+                userPassword: {
+                    required: true,
+                    minlength: 6
+                }
+            },
+            messages: {
+                userName: {
+                    required: "Please enter the "
+                },
+                userEmail: {
+                    required: "Please enter the ",
+                    email: true
+                },
+                userPassword: {
+                    required: "Please enter the ",
+                    minlength: "Please enter atleast 6 digits."
+                }
+            }
+
+        })
+    })
+</script>
+
 <section class="vh-100 bg-image">
     {{!-- style="background-image: url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp');"> --}}
     <div class="mask d-flex align-items-center h-100 gradient-custom-3">
@@ -8,26 +42,33 @@
                         <div class="card-body p-5">
                             <h2 class="text-uppercase text-center mb-5">Create an account</h2>
 
-                            <form method="post" action="/signup">
+                            {{#if userExists}}
+                            <p class="text-danger mb-5 mt-3">{{userExistsMsg}}</p>
+                            {{/if}}
+
+                            <form id="signupForm" method="post" action="/signup">
 
                                 <div class="form-outline mb-4">
-                                    <input type="text" id="name" class="form-control form-control-lg" name="userName"/>
-                                    <label class="form-label" for="name">Your Name</label>
+                                    <input type="text" id="name" class="form-control form-control-lg" name="userName" />
+                                    <label class="form-label pt-2" for="name">Name</label>
                                 </div>
 
                                 <div class="form-outline mb-4">
-                                    <input type="email" id="form3Example3cg" class="form-control form-control-lg" name="userEmail" />
-                                    <label class="form-label" for="form3Example3cg">Your Email</label>
+                                    <input type="email" id="form3Example3cg" class="form-control form-control-lg"
+                                        name="userEmail" />
+                                    <label class="form-label pt-2" for="form3Example3cg">Email</label>
                                 </div>
 
 
                                 <div class="form-outline mb-4">
-                                    <input type="password" id="form3Example4cg" class="form-control form-control-lg" name="userPassword"/>
-                                    <label class="form-label" for="form3Example4cg">Enter the password</label>
+                                    <input type="password" id="form3Example4cg" class="form-control form-control-lg"
+                                        name="userPassword" />
+                                    <label class="form-label pt-2" for="form3Example4cg">Password</label>
                                 </div>
 
                                 {{!-- <div class="form-outline mb-4">
-                                    <input type="password" id="form3Example4cdg" class="form-control form-control-lg" name="userPasswordConfirmation"/>
+                                    <input type="password" id="form3Example4cdg" class="form-control form-control-lg"
+                                        name="userPasswordConfirmation" />
                                     <label class="form-label" for="form3Example4cdg">Enter your password again</label>
                                 </div> --}}
 

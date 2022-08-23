@@ -17,13 +17,18 @@ router.get('/', userAuth, function (req, res, next) {
 });
 
 router.get('/signup', (req, res) => {
-  res.render('users/signup')
+  res.render('users/signup',{userExists: req.session.userExists, userExistsMsg: req.session.userExistsMsg})
+  req.session.userExists = false;
 });
 
 
 router.post('/signup', (req, res) => {
   userHelpers.doSignup(req.body).then(() => {
     res.redirect('/');
+  }).catch(()=>{
+    req.session.userExists = true;
+    req.session.userExistsMsg = 'User already exists. Please choose a different email.'
+    res.redirect('/signup')
   })
 });
 
@@ -73,7 +78,8 @@ router.get('/home', userAuth, (req, res) => {
 
 
 router.get('/logout', (req, res) => {
-  req.session.destroy();
+  req.session.user = null;
+  req.session.loggedIn = false;
   res.redirect('/');
 })
 
