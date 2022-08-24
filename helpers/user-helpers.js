@@ -10,7 +10,7 @@ module.exports = {
 
             let user = await db.get().collection(collection.USER_COLLECTION).findOne({ userEmail: userData.userEmail });
             if (user) {
-                reject();
+                resolve({userExists: true})
             } else {
                 userData.userPassword = await bcrypt.hash(userData.userPassword, 10);
                 db.get().collection(collection.USER_COLLECTION).insertOne(userData).then(() => {

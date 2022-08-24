@@ -4,6 +4,7 @@ const router = express.Router();
 const productHelpers = require('../helpers/product-helpers');
 const userHelpers = require('../helpers/user-helpers');
 const adminHelpers = require('../helpers/admin-helpers');
+const { response } = require('express');
 const adminAuth = ((req, res,next) => {
   if (req.session.adminLoggedIn) {
     next();
@@ -27,7 +28,6 @@ router.post('/adminLogin', (req, res) => {
         res.redirect('/admin/adminHome');
       }
       else{
-        console.log("admin login failed ")
         req.session.loginErr = true;
         req.session.errMessage = 'Invalid admin email or password!';
         res.redirect('/admin');
@@ -51,12 +51,14 @@ router.get('/add-user', adminAuth, (req, res) => {
 
 router.post('/add-user',adminAuth, (req, res) => {
 
-  userHelpers.doSignup(req.body).then(() => {
-    res.redirect('/admin');
-  }).catch(()=>{
-    req.session.userExists = true;
-    req.session.userExistsMsg = 'User already exists. Please choose a different email.'
-    res.redirect('/admin/add-user');
+  userHelpers.doSignup(req.body).then((response) => {
+    if(response.userExists){
+      req.session.userExists = true;
+      req.session.userExistsMsg = 'User already exists! Please choose a different email.'
+      res.redirect('/admin/add-user');
+    }else{
+      res.redirect('/admin/adminHome')
+    }
   })
 });
 
