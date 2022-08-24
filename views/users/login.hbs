@@ -19,7 +19,6 @@
                     required: "Please enter the password!",
                 }
             }
-
         })
     })
 </script>
@@ -38,7 +37,7 @@
                 <h2 class="fw-bold mb-3 text-uppercase">Login</h2>
 
                   {{#if loginErr}}
-                    <p class="text-danger mb-5 mt-3">{{errMessage}}</p>
+                    <p class="text-danger mb-5 mt-3 fw-bold">{{errMessage}}</p>
                   {{/if}}                
               <div class="form-outline form-white mb-1 mb-md-4">
                 <label class="form-label" for="">Email</label>

@@ -35,7 +35,7 @@ router.post('/adminLogin', (req, res) => {
     })
 })
 
-router.get('/adminHome',adminAuth, function (req, res, next) {
+router.get('/adminHome',adminAuth, function (req, res) {
   userHelpers.getAllUsers().then((users) => {
     res.render('admin/view-users', { admin: true, users });
   });
@@ -65,7 +65,8 @@ router.post('/add-user',adminAuth, (req, res) => {
 router.get('/editUser/:id', (req, res, next) => {
   let userId = req.params.id;
   userHelpers.getUserDetails(userId).then((users) => {
-    res.render('admin/edit-user', { users });
+    res.render('admin/edit-user', {admin:true ,users, userExists: req.session.userExists, userExistsMsg: req.session.userExistsMsg });
+    req.session.userExists = false;
   }).catch((err) => {
     next(err)
   })
@@ -74,8 +75,16 @@ router.get('/editUser/:id', (req, res, next) => {
 router.post('/edit-user/:id', (req, res) => {
   let user = req.body;
   user._id = req.params.id;
-  userHelpers.editUser(user).then(() => {
-    res.redirect('/admin');
+  userHelpers.editUser(user).then((response) => {
+    if(response.userExists){
+      req.session.userExists = true;
+      req.session.userExistsMsg = 'User already exists! Please choose a different email.'
+      console.log('hello')
+      res.redirect('/admin/editUser/'+user._id)
+    }else{
+      res.redirect('/admin');
+    }
+    
   })
 })
 

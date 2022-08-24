@@ -10,7 +10,7 @@ module.exports = {
 
             let user = await db.get().collection(collection.USER_COLLECTION).findOne({ userEmail: userData.userEmail });
             if (user) {
-                resolve({userExists: true})
+                resolve({ userExists: true })
             } else {
                 userData.userPassword = await bcrypt.hash(userData.userPassword, 10);
                 db.get().collection(collection.USER_COLLECTION).insertOne(userData).then(() => {
@@ -60,9 +60,14 @@ module.exports = {
 
     editUser: (user) => {
         return new Promise((resolve, reject) => {
-            db.get().collection(collection.USER_COLLECTION).updateOne({ _id: objectId(user._id) }, { $set: { userName: user.userName, userEmail: user.userEmail } }).then((response) => {
-                resolve(response);
-            })
+            const existingUser = db.get().collection(collection.USER_COLLECTION).findOne({ userEmail: user.userEmail });
+            if (existingUser) {
+                resolve({ userExists: true })
+            } else {
+                db.get().collection(collection.USER_COLLECTION).updateOne({ _id: objectId(user._id) }, { $set: { userName: user.userName, userEmail: user.userEmail } }).then((response) => {
+                    resolve(response);
+                })
+            }
         })
     },
 
