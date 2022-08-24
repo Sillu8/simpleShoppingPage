@@ -1,9 +1,9 @@
 
-const { response } = require('express');
 const express = require('express');
 const router = express.Router();
 const productHelpers = require('../helpers/product-helpers');
 const userHelpers = require('../helpers/user-helpers');
+const adminHelpers = require('../helpers/admin-helpers');
 const adminAuth = ((req, res,next) => {
   if (req.session.adminLoggedIn) {
     next();
@@ -15,44 +15,24 @@ const adminAuth = ((req, res,next) => {
 })
 
 
-const adminName = "admin@gmail.com";
-const adminPW = 'a';
-
 /* GET home page. */
 router.get('/',adminAuth, function (req, res, next) {
     res.redirect('/admin/adminHome');
 });
 
 router.post('/adminLogin', (req, res) => {
-  if (req.body.userEmail === '' && req.body.userPassword === '') {
-    req.session.loginErr = true;
-    req.session.errMessage = 'Please enter the required fields';
-    res.redirect('/admin');
-  } else {
-    if (req.body.userEmail === '') {
-      req.session.loginErr = true;
-      req.session.errMessage = 'Please enter the email';
-      res.redirect('/admin');
-    }
-    else {
-      if (req.body.userPassword === '') {
-        req.session.loginErr = true;
-        req.session.errMessage = 'Please enter the password';
-        res.redirect('/admin');
-      } else {
-        if (req.body.userEmail === adminName && req.body.userPassword === adminPW) {
-          req.session.adminLoggedIn = true;
-          req.session.admin = req.body;
-          res.redirect('/admin/adminHome');
-        }
-        else {
-          req.session.loginErr = true;
-          req.session.errMessage = 'Invalid admin name or password';
-          res.redirect('/admin');
-        }
+  adminHelpers.doAdminLogin(req.body).then((result)=>{
+      if(result.status){
+        req.session.adminLoggedIn = true;
+        res.redirect('/admin/adminHome');
       }
-    }
-  }
+      else{
+        console.log("admin login failed ")
+        req.session.loginErr = true;
+        req.session.errMessage = 'Invalid admin email or password!';
+        res.redirect('/admin');
+      }  
+    })
 })
 
 router.get('/adminHome',adminAuth, function (req, res, next) {
@@ -80,7 +60,7 @@ router.post('/add-user',adminAuth, (req, res) => {
   })
 });
 
-router.get('/editUser/:id',adminAuth, (req, res, next) => {
+router.get('/editUser/:id', (req, res, next) => {
   let userId = req.params.id;
   userHelpers.getUserDetails(userId).then((users) => {
     res.render('admin/edit-user', { users });
@@ -92,15 +72,14 @@ router.get('/editUser/:id',adminAuth, (req, res, next) => {
 router.post('/edit-user/:id', (req, res) => {
   let user = req.body;
   user._id = req.params.id;
-  userHelpers.editUser(user).then((response) => {
-    console.log(response);
+  userHelpers.editUser(user).then(() => {
     res.redirect('/admin');
   })
 })
 
-router.get('/deleteUser/:id',adminAuth, (req, res) => {
+router.get('/deleteUser/:id', (req, res) => {
   let userId = req.params.id;
-  userHelpers.deleteUser(userId).then((response) => {
+  userHelpers.deleteUser(userId).then(() => {
     res.redirect('/admin');
   })
 })

@@ -34,38 +34,18 @@ router.post('/signup', (req, res) => {
 
 router.post('/login', (req, res) => {
 
-  if (req.body.userEmail === '' && req.body.userPassword === '') {
-    req.session.loginErr = true;
-    req.session.errMessage = 'Please enter the required fields';
-    res.redirect('/');
-  }
-  else {
-    if (req.body.userEmail === '') {
+  userHelpers.doLogin(req.body).then((response) => {
+    if (response.status) {
+      req.session.loggedIn = true;
+      req.session.user = response.user;
+      res.redirect('/home');
+      
+    } else {
       req.session.loginErr = true;
-      req.session.errMessage = 'Please enter the username';
+      req.session.errMessage = response.errMessage;
       res.redirect('/');
     }
-    else {
-      if (req.body.userPassword === '') {
-        req.session.loginaddUser(req.body, () => {
-          res.redirect('/admin');
-        });
-      }
-      else {
-        userHelpers.doLogin(req.body).then((response) => {
-          if (response.status) {
-            req.session.loggedIn = true;
-            req.session.user = response.user;
-            res.redirect('/home');
-          } else {
-            req.session.loginErr = true;
-            req.session.errMessage = "Invalid username or password";
-            res.redirect('/');
-          }
-        });
-      }
-    }
-  }
+  });
 });
 
 

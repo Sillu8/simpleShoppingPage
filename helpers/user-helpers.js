@@ -1,7 +1,6 @@
 const db = require('../config/connection');
 const collection = require('../config/collections');
 const bcrypt = require('bcrypt');
-const { response } = require('express');
 const objectId = require('mongodb').ObjectId
 
 
@@ -23,25 +22,21 @@ module.exports = {
 
     doLogin: (userData) => {
         return new Promise(async (resolve, reject) => {
-            let loginStatus = false;
             let response = {};
             let user = await db.get().collection(collection.USER_COLLECTION).findOne({ userEmail: userData.userEmail });
             if (user) {
                 bcrypt.compare(userData.userPassword, user.userPassword).then((status) => {
                     if (status) {
-                        console.log("success")
                         response.user = user;
                         response.status = true;
                         resolve(response);
                     }
                     else {
-                        console.log("wrong password");
-                        resolve({ status: false })
+                        resolve({ status: false, errMessage: "Invalid username or password" })
                     }
                 })
             } else {
-                console.log("no user");
-                resolve({ status: false });
+                resolve({ status: false, errMessage: "User doesn't exist" });
             }
         })
     },
@@ -73,7 +68,6 @@ module.exports = {
 
     deleteUser: (userId) => {
         return new Promise((resolve, reject) => {
-            console.log(userId);
             db.get().collection(collection.USER_COLLECTION).deleteOne({ _id: objectId(userId) }).then((response) => {
                 resolve(response);
             })

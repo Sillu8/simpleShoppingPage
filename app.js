@@ -30,7 +30,8 @@ app.use(session({
   secret:'key',
   cookie: {
     maxAge: 1000 * 60 * 60
-  }
+  },resave: false,
+  saveUninitialized: true
 }));
 
 db.connect((err)=>{
